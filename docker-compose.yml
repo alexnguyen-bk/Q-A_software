@@ -1,0 +1,28 @@
+services:
+  # 1. Service cho App Java của bạn
+  app_java:
+    build: .
+    container_name: interview_app
+    ports:
+      - "8386:8386"  # Ánh xạ port 8386 từ máy thật vào 8386 của container
+    depends_on:
+      - mongodb_local
+    environment:
+      # Kích hoạt profile "local" để Spring Boot đọc file application-local.properties
+      - SPRING_PROFILES_ACTIVE=local
+      # Ghi đè URI để trỏ vào tên service của mongo thay vì localhost
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb_local:27017/interview_db
+
+  # 2. Service cho Database
+  mongodb_local:
+    image: mongo:latest
+    container_name: mongodb_interview
+    # Nếu bạn chỉ muốn App Java kết nối, có thể bỏ dòng ports dưới đây.
+    # Nhưng nên giữ để bạn có thể dùng MongoDB Compass trên máy thật kết nối vào.
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
